@@ -1,98 +1,72 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import {
+  Carousel,
+  HeroCards,
+  HeroCardsLists,
+} from "@/components/HomeScreen/HeroCards";
+import { Fragment } from "react";
+import { LinearGradient } from "expo-linear-gradient";
+import { StyleSheet, View, Text } from "react-native";
+import { SearchBarHeader } from "@/components/HomeScreen/SearchBar";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
-
+const MAX_RENDERED_ITEMS = 5;
+const INITIAL_ACTIVE_INDEX = Math.floor(MAX_RENDERED_ITEMS / 2);
 export default function HomeScreen() {
+  const activeIndex = useSharedValue(INITIAL_ACTIVE_INDEX);
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+    <Fragment>
+      <SafeAreaView>
+        <SearchBarHeader />
+      
+<View className="p-3 m-1">
+        <Carousel
+          items={data}
+          maxRenderedItems={MAX_RENDERED_ITEMS}
+          width={windowWidth}
+          activeIndex={activeIndex}
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
-
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        </View>
+        <Text className="text-white">Hi</Text>
+      </SafeAreaView>
+    </Fragment>
   );
 }
 
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
+import { Dimensions } from "react-native";
+
+import Color from "color";
+import { useSharedValue } from "react-native-reanimated";
+
+const colors = [
+  "#336699",
+  "#6699CC",
+  "#99CCFF",
+  "#CCCCFF",
+  "#99CC99",
+  "#CCFFCC",
+  "#FFFF99",
+  "#FFCC99",
+  "#FF9999",
+  "#FFCCCC",
+  "#FF99CC",
+  "#CC99FF",
+  "#9966CC",
+  "#663399",
+  "#FF9966",
+  "#FF6600",
+  "#CC6600",
+  "#996600",
+  "#FFCC00",
+  "#FFFF00",
+].map((color) => {
+  return {
+    mainColor: color,
+    accentColor: Color(color).darken(0.1).hex(),
+  };
 });
+
+const data = [ null,null,...colors, null, null];
+
+const BACKGROUND_COLOR = "#111111";
+
+const { width: windowWidth } = Dimensions.get("window");
