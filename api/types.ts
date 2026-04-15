@@ -186,3 +186,39 @@ export interface ArtifactsFetchResponse {
   artifacts: Artifact[];
   nextPage: number | undefined;
 }
+
+interface AuthorDetail {
+  id: number;
+  author: string; // Full name string
+  last: string;
+  first: string;
+  orcid_id?: string;
+  email?: string;
+  institution?: string;
+}
+interface ArticleAuthor {
+  id: number;
+  article_id: number;
+  author_id: number;
+  sequence: number;
+  email?: string;
+  institution?: string;
+  author: AuthorDetail;
+}
+
+export interface Article {
+  id: number;
+  title: string;
+  article_type: 'cdlj' | 'cdlb' | string;
+  created: string; // ISO Date string
+  modified: string; // ISO Date string
+  year: number;
+  article_no: string;
+  authors: ArticleAuthor[];
+  content_html?: string; // Optional field
+}
+
+export interface ArticlesFetchResponse {
+  articles: Article[];
+  nextPage: number | undefined;
+}

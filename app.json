@@ -49,6 +49,29 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "build": {
+          "experimental": {
+            "ios": {
+              "appExtensions": [
+                {
+                  "targetName": "ExpoWidgetsTarget",
+                  "bundleIdentifier": "org.cdli.gsocprototype.ExpoWidgetsTarget",
+                  "entitlements": {
+                    "com.apple.security.application-groups": [
+                      "group.org.cdli.gsocprototype"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "projectId": "3bae342b-c25b-4dd6-8af8-ff7c3832b578"
+      }
     }
   }
 }

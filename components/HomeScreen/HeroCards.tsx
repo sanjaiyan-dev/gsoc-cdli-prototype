@@ -1,217 +1,159 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Dimensions, View, StyleSheet } from "react-native";
 
-import { type FC } from "react";
-
-import Animated, {
-  createAnimatedComponent,
-  Extrapolation,
-  interpolate,
-  useAnimatedScrollHandler,
-  useAnimatedStyle,
-  useSharedValue,
-} from "react-native-reanimated";
-
+import { useFetchArticlesList } from "@/api/useArticles";
+import { Article } from "@/api/types";
 import { FlashList } from "@shopify/flash-list";
-import { impactAsync, ImpactFeedbackStyle } from "expo-haptics";
-import type { SharedValue } from "react-native-reanimated";
+import {
+  Host,
+  Text,
+  HorizontalDivider,
+  ElevatedButton as Button,
+} from "@expo/ui/jetpack-compose";
+import { SymbolView } from "expo-symbols";
+import {
+  impactAsync,
+  ImpactFeedbackStyle,
+  notificationAsync,
+  NotificationFeedbackType,
+} from "expo-haptics";
+import { Fragment } from "react";
 
-const AnimatedList = createAnimatedComponent(FlashList);
+const WindowWidth = Dimensions.get("window").width;
+const StoryListItemWidth = WindowWidth * 0.7;
+const StoryListItemHeight = (StoryListItemWidth / 3) * 3;
 
-type CarouselItemProps = {
-  item: {
-    mainColor: string;
-  } | null;
-  index: number;
-  translateX: SharedValue<number>;
-  itemWidth: number;
-  itemHeight: number;
-  carouselWidth: number;
-  maxRenderedItems: number;
-  activeIndex: SharedValue<number>;
-};
-
-const CarouselHeroItem: FC<CarouselItemProps> = ({
-  item,
-  index,
-  translateX,
-  itemWidth,
-  itemHeight,
-  carouselWidth,
-  maxRenderedItems,
-  activeIndex,
-}) => {
-  const rItemListStyle = useAnimatedStyle(() => {
-    const position = index * itemWidth + translateX.value;
-    const center = carouselWidth / 2;
-
-    const distanceFromCenter = Math.abs(
-      center - ((position + center + itemWidth / 2) % carouselWidth),
-    );
-    const maxDistance = carouselWidth / 2;
-    const normalizedDistanceFromCenter = 1 - distanceFromCenter / maxDistance;
-
-    const scale = interpolate(
-      normalizedDistanceFromCenter,
-      [0, 1],
-      [2, 0.8],
-      Extrapolation.CLAMP,
-    );
-
-    const initialActiveIndex = Math.floor(maxRenderedItems / 2);
-    const preciseActiveIndex =
-      initialActiveIndex +
-      (-translateX.value + itemWidth / 2) / (carouselWidth / maxRenderedItems);
-
-    activeIndex.value = Math.floor(preciseActiveIndex);
-
-    const rotateY = interpolate(
-      preciseActiveIndex - index - 0.5,
-      [-2, -1, 0, 1, 2],
-      [-25, -20, 0, 20, 25],
-    );
-    return {
-      transform: [
-        {
-          scale: scale,
-        },
-        { perspective: 500 },
-        {
-          rotateY: `${rotateY}deg`,
-        },
-      ],
-    };
-  }, []);
-
-  const rZIndexStyle = useAnimatedStyle(() => {
-    const position = index * itemWidth + translateX.value;
-    const center = carouselWidth / 2;
-
-    const distanceFromCenter = Math.abs(
-      center - ((position + center + itemWidth / 2) % carouselWidth),
-    );
-    const maxDistance = carouselWidth / 2;
-    const normalizedDistanceFromCenter = 1 - distanceFromCenter / maxDistance;
-
-    const zIndex = interpolate(
-      normalizedDistanceFromCenter,
-      [0, 1],
-      [1000, 0],
-      Extrapolation.CLAMP,
-    );
-
-    return {
-      zIndex: Math.floor(zIndex),
-    };
-  }, []);
-
+const ArticleCard = ({ article }: { article: Article }) => {
   return (
-    <Animated.View style={rZIndexStyle} className={"rounded-4xl  mt-24"}>
-      <Animated.View
-        key={index}
-        style={[
-          {
-            height: itemHeight,
-            width: itemWidth,
-          },
-          rItemListStyle,
-        ]}
+    <Fragment>
+      <View
+        onTouchStart={() => console.log("Hi")}
+        onTouchEnd={() => console.log("Bye")}
+        className={
+          "bg-amber-100 flex-1  shadow-lg shadow-teal-700 will-change-auto m-3 rounded-2xl " +
+          ROTATIONS[Math.floor(Math.random() * ROTATIONS.length)]
+        }
+        style={{
+          minWidth: StoryListItemWidth,
+          maxWidth: StoryListItemWidth,
+          minHeight: StoryListItemHeight,
+          maxHeight: StoryListItemHeight,
+        }}
       >
-        <View
-          className="rounded-lg text-center object-center items-center"
-          style={[
-            {
-              flex: 3,
-
-              backgroundColor: item?.mainColor ?? "transparent",
-              borderCurve: "continuous",
-            },
-            item?.mainColor ? styles.shadow : {},
-          ]}
-        >
-          <Text>Artifacts</Text>
+        <View className="p-3 m-3 overflow-hidden text-justify">
+          <Host matchContents>
+            <Text
+              style={{
+                fontFamily: "cursive",
+                typography: "titleMedium",
+                textAlign: "justify",
+                textDecoration: "underline",
+                shadow: { color: "orange", blurRadius: 3 },
+              }}
+            >
+              {article.title}
+            </Text>
+            <Host matchContents>
+              <Text
+                style={{
+                  typography: "bodyMedium",
+                  textAlign: "justify",
+                  fontFamily: "monospace",
+                }}
+              >
+                {"\n"}
+                {"\n"}
+                {"\n"}
+                {truncateDescription(article.content_html, 250)}
+              </Text>
+            </Host>
+          </Host>
+          <Host matchContents>
+            <HorizontalDivider />
+          </Host>
+          <Host matchContents>
+            <Button onClick={() => alert(article.id)}>
+              <Text>Read </Text>
+              <SymbolView className="m-12" name={{ android: "auto_stories" }} />
+            </Button>
+          </Host>
         </View>
-      </Animated.View>
-    </Animated.View>
+      </View>
+    </Fragment>
   );
 };
+
+const ROTATIONS = [
+  "-rotate-3",
+  "rotate-3",
+  "-rotate-2",
+  "rotate-2",
+  "-rotate-1",
+  "rotate-1",
+];
+
+const truncateDescription = (html: string | undefined, limit: number = 200) => {
+  if (!html) return "";
+
+  // 1. Strip HTML tags
+  let text = html.replace(/<[^>]*>?/gm, "");
+
+  // 2. Decode common HTML Entities
+  const entities: { [key: string]: string } = {
+    "&sect;": "§",
+    "&rsquo;": "’",
+    "&lsquo;": "‘",
+    "&rdquo;": "”",
+    "&ldquo;": "“",
+    "&ndash;": "–",
+    "&mdash;": "—",
+    "&amp;": "&",
+    "&nbsp;": " ",
+    "&gt;": ">",
+    "&lt;": "<",
+    "&deg;": "°",
+  };
+
+  // Replace entities using a regex
+  text = text.replace(/&[a-z0-9]+;/gi, (match) => entities[match] || match);
+
+  // 3. Truncate
+  if (text.length <= limit) return text;
+  return text.substring(0, limit).trim() + "...";
+};
+
+const Carousel = () => {
+  const { data, hasNextPage, fetchNextPage } = useFetchArticlesList();
+  const allArticles = data?.pages.flatMap((page) => page.articles) ?? [];
+
+  return (
+    <View style={styles.container}>
+      <FlashList
+        className="rounded-lg"
+        decelerationRate={"fast"}
+        onEndReached={() => {
+          if (hasNextPage) {
+            impactAsync(ImpactFeedbackStyle.Soft);
+            fetchNextPage();
+          } else {
+            notificationAsync(NotificationFeedbackType.Error);
+          }
+        }}
+        horizontal
+        data={allArticles}
+        keyExtractor={(article) => article.id.toString()}
+        renderItem={(article) => {
+          return <ArticleCard article={article.item} />;
+        }}
+      />
+    </View>
+  );
+};
+
 const styles = StyleSheet.create({
-  shadow: {
-    boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.25)",
+  container: {
+    minWidth: StoryListItemWidth,
+    minHeight: StoryListItemHeight * 1.2,
   },
 });
-
-type BaseCarouselItemType = {
-  mainColor: string;
-};
-
-type CarouselProps<T extends BaseCarouselItemType = BaseCarouselItemType> = {
-  items: (T | null)[];
-  maxRenderedItems: number;
-  width: number;
-  activeIndex: SharedValue<number>;
-};
-
-// Define a constant that holds the aspect ratio of each item in the list
-// Feel free to update it to match your needs (or pass it as a props)
-const LIST_ITEM_ASPECT_RATIO = 3 / 4;
-
-// Define the Carousel component with the given props
-const Carousel: FC<CarouselProps> = ({
-  items,
-  maxRenderedItems,
-  width,
-  activeIndex,
-}) => {
-  // Calculate the width and height of each list item based on the given width and aspect ratio
-  const LIST_ITEM_WIDTH = width / maxRenderedItems;
-  const LIST_ITEM_HEIGHT = LIST_ITEM_WIDTH / LIST_ITEM_ASPECT_RATIO;
-
-  // Create a shared animated value to track the current position of the list
-  const translateX = useSharedValue(0);
-
- 
-  const onScroll = useAnimatedScrollHandler({
-    onScroll: ({ contentOffset: { x } }) => {
-      translateX.value = -x;
-    },
-  });
-
-  // Render the carousel using the Animated ScrollView and the CarouselItem component
-  return (
-    <Animated.View className="shadow-inner shadow-amber-950 max-h-100 rounded-4xl justify-center items-end">
-      <AnimatedList
-        horizontal
-        pagingEnabled
-        onEndReached={() => impactAsync(ImpactFeedbackStyle.Soft)}
-        contentContainerStyle={{
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-        showsHorizontalScrollIndicator={false}
-        onScroll={onScroll}
-        scrollEventThrottle={16}
-        decelerationRate={0.8}
-        data={items}
-        keyExtractor={(_, index) => index.toString()}
-        renderItem={({ item, index }) => {
-          return (
-            <CarouselHeroItem
-              key={index}
-              item={item}
-              index={index}
-              translateX={translateX}
-              itemWidth={LIST_ITEM_WIDTH}
-              itemHeight={LIST_ITEM_HEIGHT}
-              carouselWidth={width}
-              maxRenderedItems={maxRenderedItems}
-              activeIndex={activeIndex}
-            />
-          );
-        }}
-        snapToOffsets={items.map((_, index) => index * LIST_ITEM_WIDTH)}
-      />
-    </Animated.View>
-  );
-};
 
 export { Carousel };
