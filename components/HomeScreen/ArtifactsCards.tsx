@@ -10,9 +10,11 @@ import {
 import { Image } from "expo-image";
 import { useAtomValue } from "jotai";
 import { Activity, Fragment, useDeferredValue } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { Text, View, Button } from "react-native";
+import { useRouter } from "expo-router";
 
 const ArtifactsCards = () => {
+  const router = useRouter();
   const { data, fetchNextPage, hasNextPage } = useFetchArtifactsList();
   const artifacts = data?.pages.flatMap((page) => page.artifacts) ?? [];
   const searchTerm = useAtomValue(SearchArtifacts).trim();
@@ -23,6 +25,7 @@ const ArtifactsCards = () => {
       .toLowerCase()
       .includes(defferedSearchTerm.trim().toLowerCase()),
   );
+
   return (
     <Fragment>
       <View style={{ flex: 1, margin: 3 }}>
@@ -63,6 +66,10 @@ const ArtifactsCards = () => {
               <Fragment>
                 <View className="bg-amber-200 min-h-108 p-3 m-3 rounded-3xl">
                   <Image
+                    recyclingKey={
+                      artifact.item.id.toString() +
+                      artifact.item.external_resources[0].external_resource_key
+                    }
                     contentFit="cover"
                     className="min-w-4xl min-h-3xl rounded-xl"
                     style={{
@@ -79,7 +86,26 @@ const ArtifactsCards = () => {
                   <Text>
                     Collection:{" "}
                     {artifact.item?.collections[0]?.collection?.collection}
+                    {"\n"}
                   </Text>
+                  <View className="rounded-lg bg-amber-500">
+                    <Button
+                      color={"#0b4f4a"}
+                      className="rounded-lg bg-teal-900"
+                      title="Learn More"
+                      onPress={() =>
+                        router.push({
+                          pathname: "/[artifactID]",
+                          params: {
+                            artifactID: artifact.item.id.toString(),
+                            imageID:
+                              artifact.item.external_resources[0]
+                                .external_resource_key,
+                          },
+                        })
+                      }
+                    />
+                  </View>
                 </View>
               </Fragment>
             );

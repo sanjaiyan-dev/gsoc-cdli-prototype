@@ -1,9 +1,9 @@
 import { SearchArtifacts } from "@/store/search";
 import { BASE_URL, HEADERS } from "./config";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useAtomValue } from "jotai";
 import { useDeferredValue } from "react";
-import { ArticlesFetchResponse, Artifact, ArtifactsFetchResponse } from "./types";
+import { Artifact, ArtifactsFetchResponse } from "./types";
 import axios from "axios";
 const fetchArtifactsList = async ({
   pageParam = 1,
@@ -20,7 +20,7 @@ const fetchArtifactsList = async ({
 
   const { data } = await axios.get(url, { headers: HEADERS, signal });
 
- 
+
   // The CDLI API usually returns an array of artifacts directly
   // or inside a "data" or "results" key depending on the endpoint version.
   const artifacts: Artifact[] = Array.isArray(data)
@@ -49,3 +49,16 @@ export const useFetchArtifactsList = () => {
     initialPageParam: 1,
   });
 };
+
+export const useFetchArtifact = ({ artifactID }: { artifactID: string }) => {
+  return useQuery<Artifact, Error>({
+    queryKey: ['Artifact', artifactID],
+    queryFn: async ({ signal }) => {
+      const url = `${BASE_URL}/artifacts/${artifactID}`;
+
+      const { data } = await axios.get(url, { headers: HEADERS, signal });
+      return data[0]
+    },
+    enabled: !!artifactID
+  })
+}

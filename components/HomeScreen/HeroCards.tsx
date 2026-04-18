@@ -1,21 +1,20 @@
-import { Dimensions, View, StyleSheet } from "react-native";
-
-import { useFetchArticlesList } from "@/api/useArticles";
+import { Dimensions, StyleSheet, View } from "react-native";
 import { Article } from "@/api/types";
-import { FlashList } from "@shopify/flash-list";
+import { useFetchArticlesList } from "@/api/useArticles";
 import {
+  ElevatedButton as Button,
+  HorizontalDivider,
   Host,
   Text,
-  HorizontalDivider,
-  ElevatedButton as Button,
 } from "@expo/ui/jetpack-compose";
-import { SymbolView } from "expo-symbols";
+import { FlashList } from "@shopify/flash-list";
 import {
   impactAsync,
   ImpactFeedbackStyle,
   notificationAsync,
   NotificationFeedbackType,
 } from "expo-haptics";
+import { SymbolView } from "expo-symbols";
 import { Fragment } from "react";
 
 const WindowWidth = Dimensions.get("window").width;

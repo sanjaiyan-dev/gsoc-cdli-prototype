@@ -10,7 +10,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "../global.css";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export const unstable_settings = {
   anchor: "(tabs)",
@@ -38,6 +38,7 @@ export default function RootLayout() {
               name="modal"
               options={{ presentation: "modal", title: "Modal" }}
             />
+            <Stack.Screen name="[artifactID]" options={{ headerShown: true }} />
           </Stack>
         </SafeAreaProvider>
 

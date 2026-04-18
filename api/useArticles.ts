@@ -1,7 +1,7 @@
 
 import { BASE_URL, HEADERS } from "./config";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Article, ArticlesFetchResponse, ArtifactsFetchResponse } from "./types";
+import { Article, ArticlesFetchResponse } from "./types";
 import axios from "axios";
 
 const fetchArticlesList = async ({

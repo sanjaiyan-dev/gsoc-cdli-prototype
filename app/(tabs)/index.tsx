@@ -1,6 +1,6 @@
 import { Carousel } from "@/components/HomeScreen/HeroCards";
 import { Fragment } from "react";
-import { View, Text, Button, ScrollView } from "react-native";
+import { View } from "react-native";
 import { SearchBarHeader } from "@/components/HomeScreen/SearchBar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ArtifactsCards } from "@/components/HomeScreen/ArtifactsCards";
